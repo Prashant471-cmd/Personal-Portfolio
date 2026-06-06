@@ -78,9 +78,23 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
     } catch (error) {
-      console.error('Chat error:', error);
-      typingIndicator.remove();
-      appendMessage('assistant', 'Sorry, I am having trouble connecting right now. Please try again.');
+      console.warn('Backend API key missing or offline. Falling back to local smart assistant:', error);
+      
+      // Simulate assistant typing for a natural feel
+      setTimeout(() => {
+        typingIndicator.remove();
+        const fallbackText = getLocalFallbackResponse(messageText);
+        
+        // Append assistant message to UI
+        appendMessage('assistant', fallbackText);
+        
+        // Save assistant message to history
+        conversationHistory.push({ role: 'assistant', content: fallbackText });
+        
+        if (conversationHistory.length > 12) {
+          conversationHistory = conversationHistory.slice(-12);
+        }
+      }, 750);
     }
   });
 
@@ -107,5 +121,40 @@ document.addEventListener('DOMContentLoaded', () => {
     chatMessages.appendChild(indicator);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     return indicator;
+  }
+
+  // Helper to generate a local fallback response about Prashant Deuja
+  function getLocalFallbackResponse(query) {
+    const text = query.toLowerCase();
+    
+    const info = {
+      about: "Prashant Deuja is a Frontend Developer based in Kathmandu, Nepal. He specializes in creating responsive, user-friendly websites with clean, efficient, and maintainable code.",
+      skills: "Prashant's technical skills include: HTML, CSS, JavaScript, Responsive Design, Web Accessibility, Cross-browser Compatibility, and Performance Optimization.",
+      projects: "Prashant has built several projects: \n- E-commerce Website: Responsive online store with modern design.\n- Restaurant Website: Clean and elegant layout for a local restaurant.\n- Photography Portfolio: Minimalist portfolio for a professional photographer.",
+      contact: "You can reach Prashant via:\n- Email: deujaprashant21@gmail.com\n- Phone: +977-9876543210\n- Location: Kathmandu, Nepal\nOr use the contact form at the bottom of the page!",
+      social: "You can find Prashant on:\n- GitHub: https://github.com/Prashant471-cmd\n- LinkedIn: https://www.linkedin.com/in/prashant-deuja-16a899339/\n- Instagram: https://instagram.com/prashant_deuja\n- Facebook: https://www.facebook.com/pra.shant.363964",
+      greeting: "Hello! How can I help you today? You can ask me about Prashant's skills, projects, contact info, or social links."
+    };
+
+    if (text.includes('hello') || text.includes('hi ') || text.trim() === 'hi' || text.includes('hey') || text.includes('hola') || text.includes('greet')) {
+      return info.greeting;
+    }
+    if (text.includes('project') || text.includes('work') || text.includes('portfolio') || text.includes('website') || text.includes('build')) {
+      return info.projects;
+    }
+    if (text.includes('skill') || text.includes('tech') || text.includes('know') || text.includes('language') || text.includes('framework')) {
+      return info.skills;
+    }
+    if (text.includes('contact') || text.includes('email') || text.includes('phone') || text.includes('number') || text.includes('reach') || text.includes('mail') || text.includes('address')) {
+      return info.contact;
+    }
+    if (text.includes('about') || text.includes('who') || text.includes('nepal') || text.includes('kathmandu') || text.includes('prashant') || text.includes('deuja')) {
+      return info.about;
+    }
+    if (text.includes('github') || text.includes('linkedin') || text.includes('instagram') || text.includes('facebook') || text.includes('social')) {
+      return info.social;
+    }
+    
+    return "I'm Prashant's virtual assistant! I can tell you about his skills, projects, contact details, or social links. What would you like to know?";
   }
 });
