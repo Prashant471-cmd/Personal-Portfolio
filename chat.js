@@ -123,6 +123,21 @@ document.addEventListener('DOMContentLoaded', () => {
     return indicator;
   }
 
+  // Handle suggestion chips click
+  const chatSuggestions = document.getElementById('chat-suggestions');
+  if (chatSuggestions) {
+    chatSuggestions.addEventListener('click', (e) => {
+      const chip = e.target.closest('.suggestion-chip');
+      if (chip) {
+        const queryText = chip.getAttribute('data-text');
+        if (queryText) {
+          chatInput.value = queryText;
+          chatForm.dispatchEvent(new Event('submit'));
+        }
+      }
+    });
+  }
+
   // Helper to generate a local fallback response about Prashant Deuja
   function getLocalFallbackResponse(query) {
     const text = query.toLowerCase();

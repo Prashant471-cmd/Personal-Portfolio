@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===============================
     // 1. Navigation & Scrolling
     // ===============================
-    
     // Smooth scrolling
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
@@ -14,8 +13,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const targetElement = document.querySelector(targetId);
             
             if (targetElement) {
+                const rect = targetElement.getBoundingClientRect();
+                const scrollPosition = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+                const targetTop = rect.top + scrollPosition;
+
                 window.scrollTo({
-                    top: targetElement.offsetTop - 80,
+                    top: targetTop - 80,
                     behavior: 'smooth'
                 });
                 
@@ -34,12 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const navLinks = document.querySelectorAll('.main-nav a');
         
         let current = '';
+        const scrollPosition = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
         
         sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
+            const rect = section.getBoundingClientRect();
+            const sectionTop = rect.top + scrollPosition;
             
-            if (window.pageYOffset >= sectionTop - 100) {
+            if (scrollPosition >= sectionTop - 150) {
                 current = section.getAttribute('id');
             }
         });
@@ -51,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
     // Header scroll effect
     const header = document.querySelector('header');
     

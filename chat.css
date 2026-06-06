@@ -268,8 +268,34 @@
   transform: scale(1.05);
   background-color: #3158cd;
 }
+/* Suggestion chips */
+.chat-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: #0b0b0b;
+  border-top: 1px solid #1a1a1a;
+}
 
+.suggestion-chip {
+  background-color: #1e1e1e;
+  color: #ccc;
+  border: 1px solid #333;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
 
+.suggestion-chip:hover {
+  background-color: var(--primary-color, #4169e1);
+  color: white;
+  border-color: var(--primary-color, #4169e1);
+  transform: translateY(-1px);
+}
 
 /* Responsive adjustment */
 @media (max-width: 480px) {
