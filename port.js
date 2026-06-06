@@ -106,7 +106,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!projectGrid) return;
         
         // Get projects from localStorage
-        const projects = JSON.parse(localStorage.getItem('portfolioProjects')) || [];
+        let projects = null;
+        try {
+            projects = JSON.parse(localStorage.getItem('portfolioProjects'));
+        } catch (e) {
+            console.error("Error parsing portfolioProjects:", e);
+        }
+        
+        // Fallback to default data if empty or invalid
+        if (!projects || !Array.isArray(projects) || projects.length === 0) {
+            projects = projectsData;
+            localStorage.setItem('portfolioProjects', JSON.stringify(projectsData));
+        }
         
         // Clear existing projects
         projectGrid.innerHTML = '';
@@ -330,7 +341,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!skillList) return;
         
         // Get skills from localStorage
-        const skills = JSON.parse(localStorage.getItem('portfolioSkills')) || [];
+        let skills = null;
+        try {
+            skills = JSON.parse(localStorage.getItem('portfolioSkills'));
+        } catch (e) {
+            console.error("Error parsing portfolioSkills:", e);
+        }
+        
+        // Fallback to default data if empty or invalid
+        if (!skills || !Array.isArray(skills) || skills.length === 0) {
+            skills = skillsData;
+            localStorage.setItem('portfolioSkills', JSON.stringify(skillsData));
+        }
         
         // Clear existing skills
         skillList.innerHTML = '';
