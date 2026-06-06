@@ -269,60 +269,7 @@
   background-color: #3158cd;
 }
 
-/* Light mode overrides */
-body.light-mode .chat-container {
-  background-color: #ffffff;
-  border-color: #e0e0e0;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
 
-body.light-mode .chat-header {
-  background-color: #f8f9fa;
-  border-bottom-color: #e0e0e0;
-}
-
-body.light-mode .chat-header h3 {
-  color: #333;
-}
-
-body.light-mode .chat-messages {
-  background-color: #f1f3f5;
-}
-
-body.light-mode .system-message,
-body.light-mode .assistant-message,
-body.light-mode .typing-indicator {
-  background-color: #ffffff;
-  color: #333;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-body.light-mode .chat-input-area {
-  background-color: #ffffff;
-  border-top-color: #e0e0e0;
-}
-
-body.light-mode .chat-input-area input {
-  background-color: #f1f3f5;
-  border-color: #d1d5db;
-  color: #333;
-}
-
-body.light-mode .chat-input-area input:focus {
-  border-color: var(--primary-color, #4169e1);
-}
-
-body.light-mode .chat-close {
-  color: #666;
-}
-
-body.light-mode .chat-close:hover {
-  color: #000;
-}
-
-body.light-mode .chat-toggle .chat-badge-dot {
-  border-color: #ffffff;
-}
 
 /* Responsive adjustment */
 @media (max-width: 480px) {

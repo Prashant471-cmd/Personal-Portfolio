@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const sectionTop = section.offsetTop;
             const sectionHeight = section.clientHeight;
             
-            if (pageYOffset >= sectionTop - 100) {
+            if (window.pageYOffset >= sectionTop - 100) {
                 current = section.getAttribute('id');
             }
         });
@@ -64,108 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // ===============================
-    // 2. Project Portfolio Enhancement
+    // 2. Project Modal System
     // ===============================
-    
-    // Project data - store in local storage for persistence
-    const projectsData = [
-        {
-            id: 1,
-            title: "E-commerce Website",
-            description: "A responsive online store with modern design and smooth navigation",
-            image: "https://images.pexels.com/photos/326503/pexels-photo-326503.jpeg",
-            link: "#",
-            technologies: ["HTML", "CSS", "JavaScript", "Responsive Design"]
-        },
-        {
-            id: 2,
-            title: "Restaurant Website",
-            description: "Clean and elegant design for a local restaurant",
-            image: "https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg",
-            link: "#",
-            technologies: ["HTML", "CSS", "JavaScript", "Web Accessibility"]
-        },
-        {
-            id: 3,
-            title: "Photography Portfolio",
-            description: "Minimalist portfolio for a professional photographer",
-            image: "https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg",
-            link: "#",
-            technologies: ["HTML", "CSS", "JavaScript", "Performance Optimization"]
-        }
-    ];
-    
-    // Initialize localStorage projects if not exists
-    if (!localStorage.getItem('portfolioProjects')) {
-        localStorage.setItem('portfolioProjects', JSON.stringify(projectsData));
-    }
-    
-    // Render projects function
-    function renderProjects() {
-        const projectGrid = document.querySelector('.project-grid');
-        if (!projectGrid) return;
-        
-        // Get projects from localStorage
-        let projects = null;
-        try {
-            projects = JSON.parse(localStorage.getItem('portfolioProjects'));
-        } catch (e) {
-            console.error("Error parsing portfolioProjects:", e);
-        }
-        
-        // Fallback to default data if empty or invalid
-        if (!projects || !Array.isArray(projects) || projects.length === 0) {
-            projects = projectsData;
-            localStorage.setItem('portfolioProjects', JSON.stringify(projectsData));
-        }
-        
-        // Clear existing projects
-        projectGrid.innerHTML = '';
-        
-        // Create project cards
-        projects.forEach(project => {
-            const projectCard = document.createElement('div');
-            projectCard.className = 'project-card';
-            projectCard.dataset.id = project.id;
-            
-            // Create tech badges HTML
-            const techBadges = project.technologies ? 
-                `<div class="tech-badges">
-                    ${project.technologies.map(tech => `<span class="tech-badge">${tech}</span>`).join('')}
-                </div>` : '';
-            
-            projectCard.innerHTML = `
-                <img src="${project.image}" alt="${project.title}">
-                <h3>${project.title}</h3>
-                <p>${project.description}</p>
-                ${techBadges}
-                <div class="project-actions">
-                    <a href="${project.link}" class="btn btn-outline" target="_blank">View Project</a>
-                    <button class="btn btn-icon project-details-btn" title="View Details">
-                        <i class="fas fa-info-circle"></i>
-                    </button>
-                </div>
-            `;
-            
-            projectGrid.appendChild(projectCard);
-            
-            // Add click handler for details button
-            projectCard.querySelector('.project-details-btn').addEventListener('click', () => {
-                showProjectDetails(project);
-            });
-        });
-        
-        // Add hover effects
-        document.querySelectorAll('.project-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.classList.add('card-hover');
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.classList.remove('card-hover');
-            });
-        });
-    }
     
     // Show project details modal
     function showProjectDetails(project) {
@@ -220,9 +120,35 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
-    // Initialize projects
-    renderProjects();
+
+    // Set up project modal click listeners on static cards
+    function initProjectModals() {
+        document.querySelectorAll('.project-card').forEach(card => {
+            const detailsBtn = card.querySelector('.project-details-btn');
+            if (!detailsBtn) return;
+
+            detailsBtn.addEventListener('click', () => {
+                const title = card.querySelector('h3').textContent;
+                const description = card.querySelector('p').textContent;
+                const image = card.querySelector('img').src;
+                const techBadges = Array.from(card.querySelectorAll('.tech-badge')).map(b => b.textContent);
+                const link = card.querySelector('.btn-outline').getAttribute('href') || '#';
+                
+                showProjectDetails({ title, description, image, technologies: techBadges, link });
+            });
+
+            // Card hover effects
+            card.addEventListener('mouseenter', function() {
+                this.classList.add('card-hover');
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.classList.remove('card-hover');
+            });
+        });
+    }
+
+    initProjectModals();
     
     // ===============================
     // 3. Contact Form with Validation & Storage
@@ -261,8 +187,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 read: false
             };
             
-            // Store in local storage
-            saveMessage(newMessage);
+            // Store in local storage safely
+            try {
+                const messages = JSON.parse(localStorage.getItem('contactMessages')) || [];
+                messages.push(newMessage);
+                localStorage.setItem('contactMessages', JSON.stringify(messages));
+            } catch (err) {
+                console.error("Error saving contact message:", err);
+            }
             
             // Show success message
             showNotification('Message sent successfully! I will get back to you soon.', 'success');
@@ -270,13 +202,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reset form
             contactForm.reset();
         });
-    }
-    
-    // Save message to localStorage
-    function saveMessage(message) {
-        const messages = JSON.parse(localStorage.getItem('contactMessages')) || [];
-        messages.push(message);
-        localStorage.setItem('contactMessages', JSON.stringify(messages));
     }
     
     // Email validation helper
@@ -317,126 +242,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ===============================
-    // 5. Dynamic Skills Visualization
+    // 5. Portfolio Filter System
     // ===============================
     
-    // Skill data
-    const skillsData = [
-        { name: "HTML", proficiency: 90 },
-        { name: "CSS", proficiency: 85 },
-        { name: "Responsive Design", proficiency: 80 },
-        { name: "Web Accessibility", proficiency: 75 },
-        { name: "Cross-browser Compatibility", proficiency: 70 },
-        { name: "Performance Optimization", proficiency: 65 }
-    ];
-    
-    // Initialize skills if not in localStorage
-    if (!localStorage.getItem('portfolioSkills')) {
-        localStorage.setItem('portfolioSkills', JSON.stringify(skillsData));
-    }
-    
-    // Render skills with visual indicators
-    function renderSkills() {
-        const skillList = document.querySelector('.skill-list');
-        if (!skillList) return;
-        
-        // Get skills from localStorage
-        let skills = null;
-        try {
-            skills = JSON.parse(localStorage.getItem('portfolioSkills'));
-        } catch (e) {
-            console.error("Error parsing portfolioSkills:", e);
-        }
-        
-        // Fallback to default data if empty or invalid
-        if (!skills || !Array.isArray(skills) || skills.length === 0) {
-            skills = skillsData;
-            localStorage.setItem('portfolioSkills', JSON.stringify(skillsData));
-        }
-        
-        // Clear existing skills
-        skillList.innerHTML = '';
-        
-        // Create skill items
-        skills.forEach(skill => {
-            const skillItem = document.createElement('li');
-            
-            skillItem.innerHTML = `
-                <span class="skill-name">${skill.name}</span>
-                <div class="skill-bar">
-                    <div class="skill-progress" style="width: ${skill.proficiency}%"></div>
-                </div>
-                <span class="skill-percentage">${skill.proficiency}%</span>
-            `;
-            
-            skillList.appendChild(skillItem);
-        });
-    }
-    
-    // Initialize skills visualization
-    renderSkills();
-    
-    // ===============================
-    // 6. Theme Switcher
-    // ===============================
-    
-    function createThemeToggle() {
-        const themeToggle = document.createElement('button');
-        themeToggle.className = 'theme-toggle';
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-        themeToggle.title = 'Toggle Dark/Light mode';
-        
-        document.body.appendChild(themeToggle);
-        
-        // Check for saved theme preference
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-mode');
-            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        }
-        
-        // Toggle theme on click
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-mode');
-            
-            if (document.body.classList.contains('light-mode')) {
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                localStorage.setItem('theme', 'light');
-            } else {
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                localStorage.setItem('theme', 'dark');
-            }
-        });
-    }
-    
-    // Initialize theme toggle
-    createThemeToggle();
-    
-    // ===============================
-    // 7. Portfolio Filter System
-    // ===============================
-    
-    function createPortfolioFilter() {
+    function initPortfolioFilter() {
         const projectsSection = document.querySelector('#projects');
         if (!projectsSection) return;
         
-        // Get all unique technologies from projects
-        let projects = null;
-        try {
-            projects = JSON.parse(localStorage.getItem('portfolioProjects'));
-        } catch (e) {
-            console.error("Error parsing portfolioProjects in filter:", e);
-        }
-
-        if (!projects || !Array.isArray(projects) || projects.length === 0) {
-            projects = projectsData;
-        }
-
+        // Read technologies statically from the DOM cards
         const allTechnologies = new Set();
+        const cards = document.querySelectorAll('.project-card');
         
-        projects.forEach(project => {
-            if (project.technologies) {
-                project.technologies.forEach(tech => allTechnologies.add(tech));
+        cards.forEach(card => {
+            const techString = card.getAttribute('data-technologies');
+            if (techString) {
+                techString.split(',').forEach(tech => allTechnologies.add(tech.trim()));
             }
         });
         
@@ -468,27 +288,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const filter = this.getAttribute('data-filter');
                 
-                // Get projects dynamically from localStorage to prevent closure/staleness issues
-                let currentProjects = null;
-                try {
-                    currentProjects = JSON.parse(localStorage.getItem('portfolioProjects'));
-                } catch (e) {
-                    console.error("Error parsing projects in click event:", e);
-                }
-
-                if (!currentProjects || !Array.isArray(currentProjects) || currentProjects.length === 0) {
-                    currentProjects = projectsData;
-                }
-
                 // Filter projects
-                document.querySelectorAll('.project-card').forEach(card => {
+                cards.forEach(card => {
                     if (filter === 'all') {
                         card.style.display = 'block';
                     } else {
-                        const projectId = card.dataset.id;
-                        const project = currentProjects.find(p => p.id == projectId);
+                        const techString = card.getAttribute('data-technologies') || '';
+                        const technologies = techString.split(',').map(t => t.trim());
                         
-                        if (project && project.technologies && project.technologies.includes(filter)) {
+                        if (technologies.includes(filter)) {
                             card.style.display = 'block';
                         } else {
                             card.style.display = 'none';
@@ -501,12 +309,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
-    // Initialize portfolio filter
-    createPortfolioFilter();
+
+    initPortfolioFilter();
     
     // ===============================
-    // 8. Simple Animation System
+    // 6. Scroll Animation System
     // ===============================
     
     // Fade in elements as they scroll into view
@@ -541,41 +348,45 @@ document.addEventListener('DOMContentLoaded', function() {
     initScrollAnimations();
     
     // ===============================
-    // 9. Simple Portfolio Analytics
+    // 7. Portfolio Analytics
     // ===============================
     
     function initAnalytics() {
-        // Page visit tracking
-        const visitDate = new Date().toISOString();
-        const visits = JSON.parse(localStorage.getItem('portfolioVisits')) || [];
-        visits.push({ date: visitDate, page: window.location.pathname });
-        localStorage.setItem('portfolioVisits', JSON.stringify(visits));
-        
-        // Section view tracking
-        const sections = document.querySelectorAll('section');
-        const viewedSections = new Set();
-        
-        function trackSectionViews() {
-            sections.forEach(section => {
-                const sectionTop = section.getBoundingClientRect().top;
-                const windowHeight = window.innerHeight;
-                
-                if (sectionTop < windowHeight * 0.7 && !viewedSections.has(section.id)) {
-                    viewedSections.add(section.id);
+        try {
+            // Page visit tracking
+            const visitDate = new Date().toISOString();
+            const visits = JSON.parse(localStorage.getItem('portfolioVisits')) || [];
+            visits.push({ date: visitDate, page: window.location.pathname });
+            localStorage.setItem('portfolioVisits', JSON.stringify(visits));
+            
+            // Section view tracking
+            const sections = document.querySelectorAll('section');
+            const viewedSections = new Set();
+            
+            function trackSectionViews() {
+                sections.forEach(section => {
+                    const sectionTop = section.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
                     
-                    // Record section view
-                    const sectionViews = JSON.parse(localStorage.getItem('sectionViews')) || {};
-                    sectionViews[section.id] = (sectionViews[section.id] || 0) + 1;
-                    localStorage.setItem('sectionViews', JSON.stringify(sectionViews));
-                }
-            });
+                    if (sectionTop < windowHeight * 0.7 && !viewedSections.has(section.id)) {
+                        viewedSections.add(section.id);
+                        
+                        // Record section view
+                        const sectionViews = JSON.parse(localStorage.getItem('sectionViews')) || {};
+                        sectionViews[section.id] = (sectionViews[section.id] || 0) + 1;
+                        localStorage.setItem('sectionViews', JSON.stringify(sectionViews));
+                    }
+                });
+            }
+            
+            // Track section views on scroll
+            window.addEventListener('scroll', trackSectionViews);
+            
+            // Initial check
+            trackSectionViews();
+        } catch (err) {
+            console.error("Analytics error:", err);
         }
-        
-        // Track section views on scroll
-        window.addEventListener('scroll', trackSectionViews);
-        
-        // Initial check
-        trackSectionViews();
     }
     
     // Initialize analytics
