@@ -421,7 +421,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!projectsSection) return;
         
         // Get all unique technologies from projects
-        const projects = JSON.parse(localStorage.getItem('portfolioProjects')) || [];
+        let projects = null;
+        try {
+            projects = JSON.parse(localStorage.getItem('portfolioProjects'));
+        } catch (e) {
+            console.error("Error parsing portfolioProjects in filter:", e);
+        }
+
+        if (!projects || !Array.isArray(projects) || projects.length === 0) {
+            projects = projectsData;
+        }
+
         const allTechnologies = new Set();
         
         projects.forEach(project => {
@@ -458,13 +468,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const filter = this.getAttribute('data-filter');
                 
+                // Get projects dynamically from localStorage to prevent closure/staleness issues
+                let currentProjects = null;
+                try {
+                    currentProjects = JSON.parse(localStorage.getItem('portfolioProjects'));
+                } catch (e) {
+                    console.error("Error parsing projects in click event:", e);
+                }
+
+                if (!currentProjects || !Array.isArray(currentProjects) || currentProjects.length === 0) {
+                    currentProjects = projectsData;
+                }
+
                 // Filter projects
                 document.querySelectorAll('.project-card').forEach(card => {
                     if (filter === 'all') {
                         card.style.display = 'block';
                     } else {
-                        const projectId = parseInt(card.dataset.id);
-                        const project = projects.find(p => p.id === projectId);
+                        const projectId = card.dataset.id;
+                        const project = currentProjects.find(p => p.id == projectId);
                         
                         if (project && project.technologies && project.technologies.includes(filter)) {
                             card.style.display = 'block';
@@ -473,6 +495,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 });
+
+                // Trigger a scroll event to update elements' opacity in view (animate-visible)
+                window.dispatchEvent(new Event('scroll'));
             });
         });
     }
